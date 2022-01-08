@@ -1,4 +1,5 @@
-Библиотека для отображения топологии кластеров
+# Paranoid
+The library for rendering cluster topologies
 
 ### Превью и дев-режим
 
