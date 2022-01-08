@@ -14,6 +14,9 @@
     "type": "git",
     "url": "git@github.com:yandex-cloud/paranoid.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "start": "start-storybook -p 7010",
@@ -21,7 +24,9 @@
     "prepublishOnly": "npm run build",
     "lint:js": "eslint src --ext .js,.jsx,.ts,.tsx",
     "lint:prettier": "prettier --check --loglevel=error 'src/**/*.{js,jsx,ts,tsx}'",
-    "lint": "run-p lint:*"
+    "lint": "run-p lint:*",
+    "test": "exit 0",
+    "typecheck": "npm run build -- --noEmit"
   },
   "dependencies": {
     "copy-to-clipboard": "^3.3.1",
