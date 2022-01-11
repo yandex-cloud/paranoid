@@ -30,6 +30,8 @@ jobs:
       with:
         node-version: '14.x'
         cache: 'npm'
+    - name: Check for internal registry refs
+      run: '! grep -e npm.yandex-team.ru package-lock.json'
     - name: Install Packages
       run: npm ci
     - name: Lint Files
