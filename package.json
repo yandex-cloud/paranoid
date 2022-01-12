@@ -2,7 +2,7 @@
   "name": "@yandex-cloud/paranoid",
   "version": "0.1.0",
   "description": "Paranoid. Topology rendering.",
-  "main": "index.js",
+  "main": "build/esm/index.js",
   "files": [
     "build/esm/lib",
     "build/esm/index.d.ts",
