@@ -1,9 +1,36 @@
+export function getCommonColors() {
+  const colorsMap: Record<string, string> = {
+    success: "--yc-color-text-positive",
+    error: "--yc-color-scarlet",
+    warning: "--yc-color-amber",
+    mute: "--yc-color-decoration",
+    stroke: "--yc-color-text-hint",
+    fill: "--yc-color-base-area",
+    nodeFill: "--yc-color-float-area",
+    nodeShadow: "--yc-color-card-shadow",
+    titleColor: "--yc-color-text-primary",
+    textColor: "--yc-color-text-complementary",
+    buttonBorderColor: "--yc-color-divider",
+    groupBorderColor: "--yc-color-celestial-thunder",
+    groupFill: "--yc-color-celestial",
+    titleHoverColor: "--yc-color-link-hover",
+  };
+
+  const style = getComputedStyle(document.body);
+  const colors = Object.keys(colorsMap).reduce((acc, key) => {
+    const color = style.getPropertyValue(colorsMap[key]).replace(/ /g, "");
+    if (color) {
+      acc[key] = color;
+    }
+    return acc;
+  }, {} as Record<string, string>);
+  return colors;
+}
+
 export const defaultColors = {
   success: "rgba(59, 201, 53, 0.75)",
   error: "#ff0400",
   warning: "#ff7700",
-  errorBackground: "rgba(235,50,38,0.08)",
-  warningBackground: "rgba(255,219,77,0.3)",
   mute: "rgba(0,0,0,0.15)",
   stroke: "rgba(0,0,0,0.3)",
   fill: "#fafafa",
@@ -15,18 +42,6 @@ export const defaultColors = {
   groupBorderColor: "rgba(2, 123, 243, 0.14)",
   groupFill: "rgba(2, 123, 243, 0.08)",
   titleHoverColor: "#004080",
-  nodeHover: "#f3f3f3",
-  specialHover: "rgba(2,123,243,1)",
-};
-
-export const GroupControls = {
-  hasControls: false,
-  hasRotatingPoint: false,
-  lockMovementX: true,
-  lockMovementY: true,
-  selectable: false,
-  hoverCursor: "default",
-  subTargetCheck: true,
 };
 
 const ANCHOR_RADIUS = 3;
@@ -58,6 +73,8 @@ export const NodeSizes = {
   titleMaxWidth: 205,
   metaMaxWidth: 205,
   metaMarginTop: 10,
+  metricsMarginTop: 10,
+  metricsPadding: 5,
   anchorOffset: ANCHOR_OFFSET,
 };
 
@@ -76,7 +93,3 @@ export const GroupSizes = {
 };
 
 export const CLIPBOARD_WIDTH = 8;
-
-export enum NodeType {
-  Group = "GROUP",
-}

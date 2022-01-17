@@ -1,2 +1,1 @@
-export * from "./lib/models";
-export { renderGraph } from "./lib/canvas";
+export * from "./lib";

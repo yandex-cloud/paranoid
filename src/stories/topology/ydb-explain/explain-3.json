@@ -1,0 +1,81 @@
+{
+    "Plan": {
+        "PlanNodeId": 1,
+        "Node Type": "Query",
+        "Plans": [
+            {
+                "PlanNodeId": 2,
+                "Node Type": "Result",
+                "Plans": [
+                    {
+                        "PlanNodeId": 3,
+                        "Node Type": "Collect",
+                        "Plans": [
+                            {
+                                "PlanNodeId": 4,
+                                "Node Type": "Gather",
+                                "PlanNodeType": "Connection",
+                                "Plans": [
+                                    {
+                                        "PlanNodeId": 5,
+                                        "Operators": [
+                                            {
+                                                "SortBy": "(item) → item.App",
+                                                "Name": "Sort"
+                                            },
+                                            {
+                                                "Name": "Aggregate",
+                                                "Aggregate": "(item, state) → {'App': state.App, '_yql_agg_0': AggrMin(item._yql_agg_0, state._yql_agg_0), '_yql_agg_1': AggrMax(item._yql_agg_1, state._yql_agg_1)}"
+                                            }
+                                        ],
+                                        "Node Type": "Sort → Aggregate",
+                                        "Plans": [
+                                            {
+                                                "PlanNodeId": 6,
+                                                "Node Type": "Shuffle",
+                                                "PlanNodeType": "Connection",
+                                                "Plans": [
+                                                    {
+                                                        "Tables": [
+                                                            "\/Root\/Logs"
+                                                        ],
+                                                        "PlanNodeId": 7,
+                                                        "Operators": [
+                                                            {
+                                                                "ReadRanges": [
+                                                                    "App [-∞, +∞]",
+                                                                    "Ts [-∞, +∞]",
+                                                                    "Host [-∞, +∞]"
+                                                                ],
+                                                                "ReadColumns": [
+                                                                    "App",
+                                                                    "Message",
+                                                                    "Ts"
+                                                                ],
+                                                                "Name": "TableFullScan",
+                                                                "Table": "\/Root\/Logs"
+                                                            },
+                                                            {
+                                                                "Filter": "(items0, items1, items2) → IfPresent(items2, (arg) → (arg > 1) And (arg <= 4), \"false\") Or IfPresent(items0, (lhs) → lhs == \"ydb\", \"false\")",
+                                                                "Name": "Filter"
+                                                            },
+                                                            {
+                                                                "Name": "Aggregate",
+                                                                "Aggregate": "(key, items0, items1, items2, state0, state1) → AggrMin(items1, state0)"
+                                                            }
+                                                        ],
+                                                        "Node Type": "TableFullScan → Filter → Aggregate"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

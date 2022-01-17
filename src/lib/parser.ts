@@ -1,11 +1,12 @@
-import ParanoidTree, { ParanoidNode } from "./tree";
-import { Data, Link, GraphNode } from "./models";
+import { Tree, TreeNode } from "./tree";
+import { Data, Link, GraphNode, ParanoidOpts } from "./models";
 import { NodeType } from "./constants";
 
-export interface GraphGroupNode {
+export interface GraphGroupNode<TData = any> {
   name: string;
   type: NodeType;
   children: string[];
+  data: TData;
 }
 
 export type Source = GraphGroupNode | GraphNode;
@@ -18,10 +19,12 @@ interface ElementWithChildren {
 
 export default class Parser {
   data: Data;
-  nodes = new Map<string, ParanoidNode>();
+  opts: ParanoidOpts;
+  nodes = new Map<string, TreeNode>();
 
-  constructor(data: Data) {
+  constructor(data: Data, opts: ParanoidOpts) {
     this.data = data;
+    this.opts = opts;
   }
 
   parseData() {
@@ -38,9 +41,9 @@ export default class Parser {
     const sources = this.findSources(nodesAndGroupNodes, data.links);
 
     // build trees from sources
-    let trees: ParanoidTree[] = [];
-    let groupNodes: Record<string, ParanoidNode> = {};
-    let nonGroupMembersChildren = new Map<string, ParanoidNode[]>();
+    let trees: Tree[] = [];
+    let groupNodes: Record<string, TreeNode> = {};
+    let nonGroupMembersChildren = new Map<string, TreeNode[]>();
     sources.forEach((source) => {
       const nodes = this.mapNodesToTree(source, nodesAndGroupNodes, data.links);
       groupNodes = { ...nodes.groups, ...groupNodes };
@@ -65,7 +68,7 @@ export default class Parser {
         acc.push(tree);
       }
       return acc;
-    }, [] as ParanoidTree[]);
+    }, [] as Tree<Source>[]);
 
     return trees;
   }
@@ -102,7 +105,7 @@ export default class Parser {
 
   private mapNodesToTree(source: Source, nodes: Source[], links: Link[]) {
     const treeRoot = this.createNode(source);
-    const groups: Record<string, ParanoidNode> = {};
+    const groups: Record<string, TreeNode> = {};
     this.appendGoup(groups, treeRoot);
 
     const treeNodes = nodes.map((node) => {
@@ -127,13 +130,13 @@ export default class Parser {
     const notGroupMemebersChildren = appendNodes(treeRoot, sourceChildren);
 
     return {
-      tree: new ParanoidTree(treeRoot),
+      tree: new Tree(treeRoot),
       groups,
       notGroupMemebersChildren,
     };
   }
 
-  private appendGoup(groups: Record<string, ParanoidNode>, node: ParanoidNode) {
+  private appendGoup(groups: Record<string, TreeNode>, node: TreeNode) {
     const data = node.data;
     const type = (node.data as GraphGroupNode).type;
 
@@ -144,10 +147,10 @@ export default class Parser {
 
   private getAppender(
     data: ElementWithChildren[],
-    groups: Record<string, ParanoidNode>
+    groups: Record<string, TreeNode>
   ) {
-    const notGroupMemebersChildren: Map<string, ParanoidNode[]> = new Map();
-    const appendNodesToTree = (root: ParanoidNode, children: string[]) => {
+    const notGroupMemebersChildren: Map<string, TreeNode[]> = new Map();
+    const appendNodesToTree = (root: TreeNode, children: string[]) => {
       const treeNodeChildren = children.map((child) => {
         const node = data.find(
           ({ name }) => name === child
@@ -164,11 +167,11 @@ export default class Parser {
       });
       const parentGroupName = (root.data as GraphNode).group;
       const parentHasGroup = Boolean(parentGroupName);
-      const parentChildren: ParanoidNode[] = [];
+      const parentChildren: TreeNode[] = [];
 
       // this is groups what belong to parnet, but not included in group. They should be added to group children,
       // but they still have links form original parent node, not group
-      const groupChildren: ParanoidNode[] = [];
+      const groupChildren: TreeNode[] = [];
       treeNodeChildren.forEach((tree) => {
         const group = (tree.data as GraphNode).group;
 
@@ -199,7 +202,7 @@ export default class Parser {
   }
 
   private createNode(source: Source) {
-    const node = new ParanoidNode(source);
+    const node = new TreeNode(source);
     this.nodes.set(source.name, node);
     return node;
   }
