@@ -1,0 +1,199 @@
+{
+    "Plan": {
+        "PlanNodeId": 1,
+        "Node Type": "Query",
+        "Plans": [
+            {
+                "PlanNodeId": 2,
+                "Node Type": "Result",
+                "Plans": [
+                    {
+                        "PlanNodeId": 3,
+                        "Node Type": "Collect",
+                        "Plans": [
+                            {
+                                "PlanNodeId": 4,
+                                "Node Type": "Gather",
+                                "PlanNodeType": "Connection",
+                                "Plans": [
+                                    {
+                                        "PlanNodeId": 5,
+                                        "Operators": [
+                                            {
+                                                "Name": "Union"
+                                            }
+                                        ],
+                                        "Node Type": "Union",
+                                        "Plans": [
+                                            {
+                                                "PlanNodeId": 14,
+                                                "Node Type": "Gather",
+                                                "PlanNodeType": "Connection",
+                                                "Plans": [
+                                                    {
+                                                        "PlanNodeId": 15,
+                                                        "Operators": [
+                                                            {
+                                                                "Name": "TopSort",
+                                                                "Limit": "1",
+                                                                "TopSortBy": "(row) → row.Key"
+                                                            }
+                                                        ],
+                                                        "Node Type": "Sort → Limit",
+                                                        "Plans": [
+                                                            {
+                                                                "PlanNodeId": 16,
+                                                                "Node Type": "Gather",
+                                                                "PlanNodeType": "Connection",
+                                                                "Plans": [
+                                                                    {
+                                                                        "Tables": [
+                                                                            "\/Root\/KeyValue"
+                                                                        ],
+                                                                        "PlanNodeId": 17,
+                                                                        "Operators": [
+                                                                            {
+                                                                                "ReadRanges": [
+                                                                                    "Key [-∞, +∞]"
+                                                                                ],
+                                                                                "ReadColumns": [
+                                                                                    "Key"
+                                                                                ],
+                                                                                "Name": "TableFullScan",
+                                                                                "Table": "\/Root\/KeyValue"
+                                                                            },
+                                                                            {
+                                                                                "Name": "Limit",
+                                                                                "Limit": "1"
+                                                                            }
+                                                                        ],
+                                                                        "Node Type": "TableFullScan → Limit"
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "PlanNodeId": 6,
+                                                "Node Type": "Gather",
+                                                "PlanNodeType": "Connection",
+                                                "Plans": [
+                                                    {
+                                                        "PlanNodeId": 7,
+                                                        "Operators": [
+                                                            {
+                                                                "Just": "items1",
+                                                                "Name": "ConstantExpr"
+                                                            },
+                                                            {
+                                                                "SortBy": "(item) → item.Key",
+                                                                "Name": "Sort"
+                                                            }
+                                                        ],
+                                                        "Node Type": "ConstantExpr → Sort",
+                                                        "Plans": [
+                                                            {
+                                                                "PlanNodeId": 8,
+                                                                "Node Type": "Shuffle",
+                                                                "PlanNodeType": "Connection",
+                                                                "Plans": [
+                                                                    {
+                                                                        "Tables": [
+                                                                            "\/Root\/EightShard"
+                                                                        ],
+                                                                        "PlanNodeId": 9,
+                                                                        "Operators": [
+                                                                            {
+                                                                                "Just": "SafeCast(item, Int64)< item",
+                                                                                "Name": "ConstantExpr"
+                                                                            },
+                                                                            {
+                                                                                "ReadRanges": [
+                                                                                    "Key [-∞, +∞]"
+                                                                                ],
+                                                                                "ReadColumns": [
+                                                                                    "Data",
+                                                                                    "Key"
+                                                                                ],
+                                                                                "Name": "TableFullScan",
+                                                                                "Table": "\/Root\/EightShard"
+                                                                            },
+                                                                            {
+                                                                                "Filter": "(items0, items1) → Exists(items1) And Coalesce(IfPresent(items0, items1 - 100, (item, item) → Just(SafeCast(item, Int64) < item), Nothing(Bool?)), \"false\")",
+                                                                                "Name": "Filter"
+                                                                            },
+                                                                            {
+                                                                                "Name": "InnerJoin (MapJoin)"
+                                                                            },
+                                                                            {
+                                                                                "Name": "Aggregate",
+                                                                                "Aggregate": "(key, items0, items1, state0) → Inc(state0)"
+                                                                            }
+                                                                        ],
+                                                                        "Node Type": "ConstantExpr → TableFullScan → Filter → InnerJoin (MapJoin) → Aggregate",
+                                                                        "Plans": [
+                                                                            {
+                                                                                "PlanNodeId": 10,
+                                                                                "Node Type": "Scatter",
+                                                                                "PlanNodeType": "Connection",
+                                                                                "Plans": [
+                                                                                    {
+                                                                                        "PlanNodeId": 11,
+                                                                                        "Node Type": "Collect",
+                                                                                        "Plans": [
+                                                                                            {
+                                                                                                "PlanNodeId": 12,
+                                                                                                "Node Type": "Gather",
+                                                                                                "PlanNodeType": "Connection",
+                                                                                                "Plans": [
+                                                                                                    {
+                                                                                                        "Tables": [
+                                                                                                            "\/Root\/FourShard"
+                                                                                                        ],
+                                                                                                        "PlanNodeId": 13,
+                                                                                                        "Operators": [
+                                                                                                            {
+                                                                                                                "ReadRanges": [
+                                                                                                                    "Key [-∞, +∞]"
+                                                                                                                ],
+                                                                                                                "ReadColumns": [
+                                                                                                                    "Key",
+                                                                                                                    "Value1"
+                                                                                                                ],
+                                                                                                                "Name": "TableFullScan",
+                                                                                                                "Table": "\/Root\/FourShard"
+                                                                                                            },
+                                                                                                            {
+                                                                                                                "Filter": "(items0, items1) → Exists(items0) And IfPresent(items1, (lhs) → lhs != \"Value-101\", \"false\")",
+                                                                                                                "Name": "Filter"
+                                                                                                            }
+                                                                                                        ],
+                                                                                                        "Node Type": "TableFullScan → Filter"
+                                                                                                    }
+                                                                                                ]
+                                                                                            }
+                                                                                        ]
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

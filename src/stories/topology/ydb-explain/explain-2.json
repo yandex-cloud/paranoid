@@ -1,0 +1,117 @@
+{
+    "Plan": {
+        "PlanNodeId": 1,
+        "Node Type": "Query",
+        "Plans": [
+            {
+                "PlanNodeId": 2,
+                "Node Type": "Result",
+                "Plans": [
+                    {
+                        "PlanNodeId": 3,
+                        "Node Type": "Stage",
+                        "Plans": [
+                            {
+                                "PlanNodeId": 4,
+                                "Node Type": "Gather",
+                                "PlanNodeType": "Connection",
+                                "Plans": [
+                                    {
+                                        "PlanNodeId": 5,
+                                        "Operators": [
+                                            {
+                                                "Name": "Aggregate",
+                                                "Aggregate": "(item, state) → state AggrAdd item._dq_agg_cnt"
+                                            }
+                                        ],
+                                        "Node Type": "Aggregate",
+                                        "Plans": [
+                                            {
+                                                "PlanNodeId": 6,
+                                                "Node Type": "Gather",
+                                                "PlanNodeType": "Connection",
+                                                "Plans": [
+                                                    {
+                                                        "Tables": [
+                                                            "\/Root\/EightShard"
+                                                        ],
+                                                        "PlanNodeId": 7,
+                                                        "Operators": [
+                                                            {
+                                                                "Just": "{\u0027_dq_agg_cnt\u0027: state}",
+                                                                "Name": "ConstantExpr"
+                                                            },
+                                                            {
+                                                                "ReadRanges": [
+                                                                    "Key [-∞, +∞]"
+                                                                ],
+                                                                "ReadColumns": [
+                                                                    "Data"
+                                                                ],
+                                                                "Name": "TableFullScan",
+                                                                "Table": "\/Root\/EightShard"
+                                                            },
+                                                            {
+                                                                "Filter": "(items0) → Exists(items0)",
+                                                                "Name": "Filter"
+                                                            },
+                                                            {
+                                                                "Name": "InnerJoin (MapJoin)"
+                                                            }
+                                                        ],
+                                                        "Node Type": "ConstantExpr → TableFullScan → Filter → InnerJoin (MapJoin)",
+                                                        "Plans": [
+                                                            {
+                                                                "PlanNodeId": 8,
+                                                                "Node Type": "Scatter",
+                                                                "PlanNodeType": "Connection",
+                                                                "Plans": [
+                                                                    {
+                                                                        "PlanNodeId": 9,
+                                                                        "Node Type": "Collect",
+                                                                        "Plans": [
+                                                                            {
+                                                                                "PlanNodeId": 10,
+                                                                                "Node Type": "Gather",
+                                                                                "PlanNodeType": "Connection",
+                                                                                "Plans": [
+                                                                                    {
+                                                                                        "Tables": [
+                                                                                            "\/Root\/KeyValue"
+                                                                                        ],
+                                                                                        "PlanNodeId": 11,
+                                                                                        "Operators": [
+                                                                                            {
+                                                                                                "ReadRanges": [
+                                                                                                    "Key [-∞, +∞]"
+                                                                                                ],
+                                                                                                "ReadColumns": [
+                                                                                                    "Key"
+                                                                                                ],
+                                                                                                "Name": "TableFullScan",
+                                                                                                "Table": "\/Root\/KeyValue"
+                                                                                            }
+                                                                                        ],
+                                                                                        "Node Type": "TableFullScan"
+                                                                                    }
+                                                                                ]
+                                                                            }
+                                                                        ]
+                                                                    }
+                                                                ]
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}

@@ -1,0 +1,66 @@
+{
+    "Plan": {
+        "PlanNodeId": 1,
+        "Node Type": "Query",
+        "Plans": [
+            {
+                "PlanNodeId": 2,
+                "Node Type": "Result",
+                "Plans": [
+                    {
+                        "PlanNodeId": 3,
+                        "Operators": [
+                            {
+                                "SortBy": "(row) → row.Value",
+                                "Name": "Sort"
+                            }
+                        ],
+                        "Node Type": "Sort",
+                        "Plans": [
+                            {
+                                "PlanNodeId": 4,
+                                "Node Type": "Gather",
+                                "PlanNodeType": "Connection",
+                                "Plans": [
+                                    {
+                                        "Tables": [
+                                            "\/Root\/TestPredicates"
+                                        ],
+                                        "PlanNodeId": 5,
+                                        "Operators": [
+                                            {
+                                                "ReadRangesKeys": [
+                                                    "Key1",
+                                                    "Key2"
+                                                ],
+                                                "ReadRangesExpectedSize": "1",
+                                                "ReadRanges": [
+                                                    "Key1 (1000, +∞)"
+                                                ],
+                                                "ReadColumns": [
+                                                    "Key2",
+                                                    "Value"
+                                                ],
+                                                "Name": "TableRangesScan",
+                                                "Table": "\/Root\/TestPredicates"
+                                            },
+                                            {
+                                                "Filter": "(items0, items1) → Not(Exists(items0))",
+                                                "Name": "Filter"
+                                            },
+                                            {
+                                                "SortBy": "(row) → row.Value",
+                                                "Name": "Sort"
+                                            }
+                                        ],
+                                        "Node Type": "TableRangesScan → Filter → Sort"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+}
