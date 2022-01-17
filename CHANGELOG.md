@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.0](https://www.github.com/yandex-cloud/paranoid/compare/v0.1.1...v1.0.0) (2022-01-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* instead of `renderGraph(domNodeId: string, data: Data, opts?: Options)` you should use now `getCompactTopology(domNodeId: string, data: Data, opts?: Options)`
+
+### Features
+
+* added new paranoid type ([#9](https://www.github.com/yandex-cloud/paranoid/issues/9)) ([ad63b2b](https://www.github.com/yandex-cloud/paranoid/commit/ad63b2b70d24f16662f46c64c9a86caaaa4d710a))
+
 ### [0.1.1](https://www.github.com/yandex-cloud/paranoid/compare/v0.1.0...v0.1.1) (2022-01-12)
 
 
