@@ -29,8 +29,8 @@ export class Topology {
   render() {
     loadFonts().then(() => {
       const trees = this.parser.parseData();
-      const canvHeight = this.canvas.height || 0;
-      const canvWidth = this.canvas.width || 0;
+      const canvHeight = this.canvas.getHeight() || 0;
+      const canvWidth = this.canvas.getWidth() || 0;
       let maxBottom = canvHeight;
       let maxRight = canvWidth;
 
