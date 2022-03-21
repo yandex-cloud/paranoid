@@ -1,5 +1,12 @@
 # Changelog
 
+### [1.0.1](https://www.github.com/yandex-cloud/paranoid/compare/v1.0.0...v1.0.1) (2022-03-21)
+
+
+### Bug Fixes
+
+* remove deps carets ([#12](https://www.github.com/yandex-cloud/paranoid/issues/12)) ([b844247](https://www.github.com/yandex-cloud/paranoid/commit/b844247dc0c1faca51ea72184740f87e3aebeb2a))
+
 ## [1.0.0](https://www.github.com/yandex-cloud/paranoid/compare/v0.1.1...v1.0.0) (2022-01-17)
 
 
