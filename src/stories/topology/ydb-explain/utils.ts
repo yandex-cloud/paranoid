@@ -12,7 +12,7 @@ interface PlanOperator {
 }
 
 export interface Plan {
-  PlanNodeId: number;
+  PlanNodeId?: number;
   "Node Type": string;
   Plans?: Plan[];
   Operators?: PlanOperator[];
@@ -58,6 +58,17 @@ function prepareStats(plan: Plan) {
   return stats;
 }
 
+function getNodeType(plan: Plan) {
+  switch (plan.PlanNodeType) {
+    case "Connection":
+      return "connection";
+    case "ResultSet":
+      return "result";
+    default:
+      return "stage";
+  }
+}
+
 export function parseExplain(explain: RootPlan) {
   const nodes: GraphNode[] = [];
   const links: Link[] = [];
@@ -68,7 +79,7 @@ export function parseExplain(explain: RootPlan) {
         name: String(p.PlanNodeId),
         data: {
           id: p.PlanNodeId,
-          type: p.PlanNodeType === "Connection" ? "connection" : "stage",
+          type: getNodeType(p),
           name: p["Node Type"],
           operators: p.Operators?.map((o) => o.Name),
           stats: prepareStats(p),

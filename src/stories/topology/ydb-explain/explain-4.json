@@ -1,23 +1,23 @@
 {
     "Plan": {
-        "PlanNodeId": 1,
         "Node Type": "Query",
         "Plans": [
             {
-                "PlanNodeId": 2,
+                "PlanNodeId": 16,
                 "Node Type": "Result",
+                "PlanNodeType": "ResultSet",
                 "Plans": [
                     {
-                        "PlanNodeId": 3,
+                        "PlanNodeId": 15,
                         "Node Type": "Collect",
                         "Plans": [
                             {
-                                "PlanNodeId": 4,
-                                "Node Type": "Gather",
+                                "PlanNodeId": 14,
+                                "Node Type": "UnionAll",
                                 "PlanNodeType": "Connection",
                                 "Plans": [
                                     {
-                                        "PlanNodeId": 5,
+                                        "PlanNodeId": 13,
                                         "Operators": [
                                             {
                                                 "Name": "Union"
@@ -26,12 +26,12 @@
                                         "Node Type": "Union",
                                         "Plans": [
                                             {
-                                                "PlanNodeId": 14,
-                                                "Node Type": "Gather",
+                                                "PlanNodeId": 4,
+                                                "Node Type": "UnionAll",
                                                 "PlanNodeType": "Connection",
                                                 "Plans": [
                                                     {
-                                                        "PlanNodeId": 15,
+                                                        "PlanNodeId": 3,
                                                         "Operators": [
                                                             {
                                                                 "Name": "TopSort",
@@ -42,15 +42,15 @@
                                                         "Node Type": "Sort → Limit",
                                                         "Plans": [
                                                             {
-                                                                "PlanNodeId": 16,
-                                                                "Node Type": "Gather",
+                                                                "PlanNodeId": 2,
+                                                                "Node Type": "UnionAll",
                                                                 "PlanNodeType": "Connection",
                                                                 "Plans": [
                                                                     {
                                                                         "Tables": [
                                                                             "\/Root\/KeyValue"
                                                                         ],
-                                                                        "PlanNodeId": 17,
+                                                                        "PlanNodeId": 1,
                                                                         "Operators": [
                                                                             {
                                                                                 "ReadRanges": [
@@ -76,12 +76,12 @@
                                                 ]
                                             },
                                             {
-                                                "PlanNodeId": 6,
-                                                "Node Type": "Gather",
+                                                "PlanNodeId": 12,
+                                                "Node Type": "UnionAll",
                                                 "PlanNodeType": "Connection",
                                                 "Plans": [
                                                     {
-                                                        "PlanNodeId": 7,
+                                                        "PlanNodeId": 11,
                                                         "Operators": [
                                                             {
                                                                 "Just": "items1",
@@ -95,8 +95,8 @@
                                                         "Node Type": "ConstantExpr → Sort",
                                                         "Plans": [
                                                             {
-                                                                "PlanNodeId": 8,
-                                                                "Node Type": "Shuffle",
+                                                                "PlanNodeId": 10,
+                                                                "Node Type": "HashShuffle",
                                                                 "PlanNodeType": "Connection",
                                                                 "Plans": [
                                                                     {
@@ -135,24 +135,24 @@
                                                                         "Node Type": "ConstantExpr → TableFullScan → Filter → InnerJoin (MapJoin) → Aggregate",
                                                                         "Plans": [
                                                                             {
-                                                                                "PlanNodeId": 10,
-                                                                                "Node Type": "Scatter",
+                                                                                "PlanNodeId": 8,
+                                                                                "Node Type": "Broadcast",
                                                                                 "PlanNodeType": "Connection",
                                                                                 "Plans": [
                                                                                     {
-                                                                                        "PlanNodeId": 11,
+                                                                                        "PlanNodeId": 7,
                                                                                         "Node Type": "Collect",
                                                                                         "Plans": [
                                                                                             {
-                                                                                                "PlanNodeId": 12,
-                                                                                                "Node Type": "Gather",
+                                                                                                "PlanNodeId": 6,
+                                                                                                "Node Type": "Merge",
                                                                                                 "PlanNodeType": "Connection",
                                                                                                 "Plans": [
                                                                                                     {
                                                                                                         "Tables": [
                                                                                                             "\/Root\/FourShard"
                                                                                                         ],
-                                                                                                        "PlanNodeId": 13,
+                                                                                                        "PlanNodeId": 5,
                                                                                                         "Operators": [
                                                                                                             {
                                                                                                                 "ReadRanges": [

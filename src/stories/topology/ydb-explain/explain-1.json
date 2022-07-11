@@ -1,11 +1,11 @@
 {
     "Plan": {
-        "PlanNodeId": 1,
         "Node Type": "Query",
         "Plans": [
             {
-                "PlanNodeId": 2,
+                "PlanNodeId": 4,
                 "Node Type": "Result",
+                "PlanNodeType": "ResultSet",
                 "Plans": [
                     {
                         "PlanNodeId": 3,
@@ -18,15 +18,15 @@
                         "Node Type": "Sort",
                         "Plans": [
                             {
-                                "PlanNodeId": 4,
-                                "Node Type": "Gather",
+                                "PlanNodeId": 2,
+                                "Node Type": "UnionAll",
                                 "PlanNodeType": "Connection",
                                 "Plans": [
                                     {
                                         "Tables": [
                                             "\/Root\/TestPredicates"
                                         ],
-                                        "PlanNodeId": 5,
+                                        "PlanNodeId": 1,
                                         "Operators": [
                                             {
                                                 "ReadRangesKeys": [
