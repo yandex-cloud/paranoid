@@ -1,6 +1,7 @@
 {
     "Plan": {
         "Node Type": "Query",
+        "PlanNodeType": "Query",
         "Plans": [
             {
                 "PlanNodeId": 16,

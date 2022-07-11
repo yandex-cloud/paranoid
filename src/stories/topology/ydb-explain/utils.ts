@@ -64,6 +64,8 @@ function getNodeType(plan: Plan) {
       return "connection";
     case "ResultSet":
       return "result";
+    case "Query":
+      return "query";
     default:
       return "stage";
   }
@@ -97,7 +99,7 @@ export function parseExplain(explain: RootPlan) {
     name: String(rootPlan.PlanNodeId),
     data: {
       id: rootPlan.PlanNodeId,
-      type: "stage",
+      type: getNodeType(rootPlan),
       name: rootPlan["Node Type"],
     },
   };
