@@ -15,7 +15,7 @@ export function getCanvasObjects(
     tree.canvas as fabric.Canvas,
     opts,
     shapes,
-    tree.root,
+    tree,
     top,
     left,
     em
@@ -42,8 +42,9 @@ export function getCanvasObject(
   shapes: Shapes,
   em: ParanoidEmmiter
 ) {
-  const shape = shapes.node(canvas, { top, left }, node, opts, em);
-  const object = shape.getShape();
+  const shape =
+    node.shapeInstance ?? shapes.node(canvas, { top, left }, node, opts, em);
+  const object = node.canvasNode ?? shape.getShape();
   node.addShapeInstance(shape);
   node.addCanvasNode(object);
 

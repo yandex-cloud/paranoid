@@ -6,7 +6,6 @@ export * from "./tree";
 export * from "./compact-topology";
 export * from "./topology";
 export * from "./constants";
-export { recalculatePositions, getTreeMaxRight } from "./layout/topology/utils";
 export * from "./components/Topology";
 export * from "./components/CompactTopology";
 export * from "./shapes";

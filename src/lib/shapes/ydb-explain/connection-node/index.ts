@@ -12,10 +12,6 @@ import { ParanoidEmmiter } from "../../../event-emmiter";
 import { NodeSize } from "./constants";
 import { getTitle } from "./title";
 import { getStats } from "../../postgresql-explain/node/stats";
-import {
-  getTreeMaxRight,
-  recalculatePositions,
-} from "../../../layout/topology/utils";
 
 export class ConnectionNodeShape implements Shape {
   private readonly canvas: fabric.Canvas;
@@ -155,18 +151,13 @@ export class ConnectionNodeShape implements Shape {
         return;
       }
 
-      const maxRight = getTreeMaxRight(this.treeNode);
-      const newDimensions = this.getDimensions();
-
+      this.updateDimensions();
       this.expanded = !this.expanded;
-
-      recalculatePositions(this.treeNode, newDimensions, maxRight, this.opts);
-      this.canvas.requestRenderAll();
       this.em.dispatch("node:resize", this.treeNode);
     });
   }
 
-  private getDimensions() {
+  private updateDimensions() {
     const colors = this.opts.colors;
 
     if (this.expanded) {
@@ -182,8 +173,6 @@ export class ConnectionNodeShape implements Shape {
       this.body.setCoords();
       this.group.removeWithUpdate(this.stats as fabric.Group);
       this.stats = undefined;
-
-      return { width, height };
     } else {
       this.stats = getStats(
         this.canvas,
@@ -206,8 +195,6 @@ export class ConnectionNodeShape implements Shape {
 
       this.body.setCoords();
       this.group.addWithUpdate(this.stats);
-
-      return { width, height };
     }
   }
 

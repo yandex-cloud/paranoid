@@ -8,12 +8,11 @@ export function doTraverse(
   canvas: fabric.Canvas,
   opts: ParanoidOpts,
   shapes: Shapes,
-  treeRoot: TreeNode,
+  tree: Tree,
   treeTop: number,
   treeLeft: number,
   em: ParanoidEmmiter
 ) {
-  const tree = new Tree(treeRoot);
   const dimensionsMap = new Map<TreeNode, { width: number; height: number }>();
   const spaceMap = new Map<TreeNode, number>();
   const childrenSpaceMap = new Map<TreeNode, number>();
