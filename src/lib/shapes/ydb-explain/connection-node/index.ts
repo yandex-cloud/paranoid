@@ -11,6 +11,11 @@ import { TreeNode } from "../../../tree";
 import { ParanoidEmmiter } from "../../../event-emmiter";
 import { NodeSize } from "./constants";
 import { getTitle } from "./title";
+import { getStats } from "../../postgresql-explain/node/stats";
+import {
+  getTreeMaxRight,
+  recalculatePositions,
+} from "../../../layout/topology/utils";
 
 export class ConnectionNodeShape implements Shape {
   private readonly canvas: fabric.Canvas;
@@ -22,7 +27,9 @@ export class ConnectionNodeShape implements Shape {
   private objects: fabric.Object[];
   private body: fabric.Object;
   private group: fabric.Group;
+  private stats?: fabric.Group;
   private expanded = false;
+  private expandedNodeHeight = 0;
   private nodeHeight = 0;
 
   constructor(
@@ -89,11 +96,16 @@ export class ConnectionNodeShape implements Shape {
       stroke: colors.getCommonColor("line-misc"),
       rx: NodeSize.borderRadius,
       ry: NodeSize.borderRadius,
+      hoverCursor: this.isExpandable() ? "pointer" : "default",
     });
   }
 
   private prepareShapeObjects() {
-    const title = getTitle(this.data.name || "", this.opts.colors);
+    const title = getTitle(
+      this.data.name || "",
+      this.isExpandable(),
+      this.opts.colors
+    );
 
     return [title];
   }
@@ -119,7 +131,10 @@ export class ConnectionNodeShape implements Shape {
 
   private initListeners() {
     this.initHover();
-    // this.initExpand();
+
+    if (this.isExpandable()) {
+      this.initExpand();
+    }
   }
 
   private initHover() {
@@ -132,5 +147,71 @@ export class ConnectionNodeShape implements Shape {
       this.em.dispatch("node:mouseout", this.treeNode);
       this.toggleHighlight(false);
     });
+  }
+
+  private initExpand() {
+    this.group.on("mousedown", (event) => {
+      if (this.stats && event.subTargets?.includes(this.stats)) {
+        return;
+      }
+
+      const maxRight = getTreeMaxRight(this.treeNode);
+      const newDimensions = this.getDimensions();
+
+      this.expanded = !this.expanded;
+
+      recalculatePositions(this.treeNode, newDimensions, maxRight, this.opts);
+      this.canvas.requestRenderAll();
+      this.em.dispatch("node:resize", this.treeNode);
+    });
+  }
+
+  private getDimensions() {
+    const colors = this.opts.colors;
+
+    if (this.expanded) {
+      const width = NodeSize.width;
+      const height = this.nodeHeight;
+
+      this.body.set({
+        width,
+        height,
+        fill: this.getFillColor(),
+        shadow: this.getShadow(),
+      });
+      this.body.setCoords();
+      this.group.removeWithUpdate(this.stats as fabric.Group);
+      this.stats = undefined;
+
+      return { width, height };
+    } else {
+      this.stats = getStats(
+        this.canvas,
+        this.data.stats!,
+        (this.group.top || 0) + this.body.getScaledHeight() + NodeSize.padding,
+        (this.group.left || 0) + NodeSize.padding,
+        colors
+      );
+      this.expandedNodeHeight =
+        this.nodeHeight + this.stats.getScaledHeight() + NodeSize.padding * 2;
+
+      const width = NodeSize.expandedWidth;
+      const height = this.expandedNodeHeight;
+      this.body.set({
+        width,
+        height,
+        fill: this.getFillColor(),
+        shadow: this.getShadow(),
+      });
+
+      this.body.setCoords();
+      this.group.addWithUpdate(this.stats);
+
+      return { width, height };
+    }
+  }
+
+  private isExpandable() {
+    return Boolean(this.data.stats && this.data.stats.length > 0);
   }
 }

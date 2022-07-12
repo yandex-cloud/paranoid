@@ -9,13 +9,18 @@ import {
 } from "../../../icons";
 import { NodeSize } from "./constants";
 
-export function getTitle(name: string, colors: EnhancedColors) {
+export function getTitle(
+  name: string,
+  isExpandable: boolean,
+  colors: EnhancedColors
+) {
   const text = new fabric.Text(name, {
     fontSize: NodeSize.textFontSize,
     lineHeight: NodeSize.textFontSize,
     fontFamily: "YS Text",
     fill: colors.getCommonColor("text-misc"),
     originY: "center",
+    hoverCursor: isExpandable ? "pointer" : "default",
   });
   const items: fabric.Object[] = [text];
   let icon;

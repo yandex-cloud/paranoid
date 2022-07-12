@@ -60,6 +60,9 @@
                                                             {
                                                                 "PlanNodeId": 2,
                                                                 "Node Type": "Merge",
+                                                                "SortColumns": [
+                                                                    "Name (Asc)"
+                                                                ],
                                                                 "PlanNodeType": "Connection",
                                                                 "Plans": [
                                                                     {

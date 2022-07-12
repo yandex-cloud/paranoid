@@ -15,6 +15,9 @@
                             {
                                 "PlanNodeId": 8,
                                 "Node Type": "Merge",
+                                "SortColumns": [
+                                    "Name (Asc)"
+                                ],
                                 "PlanNodeType": "Connection",
                                 "Plans": [
                                     {

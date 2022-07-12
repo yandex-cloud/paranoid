@@ -3,6 +3,7 @@ import {
   GraphNode,
   ExplainPlanNodeData,
   TopologyNodeDataStats,
+  TopologyNodeDataStatsItem,
   TopologyNodeDataStatsSection,
 } from "../../../lib";
 
@@ -24,6 +25,13 @@ export interface Plan {
 export interface RootPlan {
   Plan: Plan;
 }
+
+const CONNECTION_NODE_META_FIELDS = new Set([
+  "PlanNodeId",
+  "PlanNodeType",
+  "Node Type",
+  "Plans",
+]);
 
 function prepareStats(plan: Plan) {
   const stats: TopologyNodeDataStats[] = [];
@@ -53,6 +61,25 @@ function prepareStats(plan: Plan) {
       group: "Operators",
       stats: operatorsSections,
     });
+  }
+
+  if (plan.PlanNodeType === "Connection") {
+    const attrStats: TopologyNodeDataStatsItem[] = [];
+
+    for (const [key, value] of Object.entries(plan)) {
+      if (CONNECTION_NODE_META_FIELDS.has(key)) {
+        continue;
+      }
+
+      attrStats.push({ name: key, value: String(value) });
+    }
+
+    if (attrStats.length > 0) {
+      stats.push({
+        group: "Attributes",
+        stats: attrStats,
+      });
+    }
   }
 
   return stats;
