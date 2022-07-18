@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0](https://github.com/yandex-cloud/paranoid/compare/v1.0.0...v1.1.0) (2022-07-18)
+
+
+### Features
+
+* update ydb explain plan view ([#14](https://github.com/yandex-cloud/paranoid/issues/14)) ([bc46eb1](https://github.com/yandex-cloud/paranoid/commit/bc46eb1c0700288c165f572ee3dc075fabe954b6))
+
+
+### Bug Fixes
+
+* remove deps carets ([#12](https://github.com/yandex-cloud/paranoid/issues/12)) ([b844247](https://github.com/yandex-cloud/paranoid/commit/b844247dc0c1faca51ea72184740f87e3aebeb2a))
+
 ## [1.0.0](https://www.github.com/yandex-cloud/paranoid/compare/v0.1.1...v1.0.0) (2022-01-17)
 
 
