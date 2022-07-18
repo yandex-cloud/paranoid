@@ -14,10 +14,6 @@ import { getStage } from "./stage";
 import { getTitle } from "./title";
 import { getTables } from "./tables";
 import { getStats } from "../../postgresql-explain/node/stats";
-import {
-  getTreeMaxRight,
-  recalculatePositions,
-} from "../../../layout/topology/utils";
 
 export class StageNodeShape implements Shape {
   private readonly canvas: fabric.Canvas;
@@ -180,18 +176,13 @@ export class StageNodeShape implements Shape {
         return;
       }
 
-      const maxRight = getTreeMaxRight(this.treeNode);
-      const newDimensions = this.getDimensions();
-
+      this.updateDimensions();
       this.expanded = !this.expanded;
-
-      recalculatePositions(this.treeNode, newDimensions, maxRight, this.opts);
-      this.canvas.requestRenderAll();
       this.em.dispatch("node:resize", this.treeNode);
     });
   }
 
-  private getDimensions() {
+  private updateDimensions() {
     const colors = this.opts.colors;
 
     if (this.expanded) {
@@ -207,8 +198,6 @@ export class StageNodeShape implements Shape {
       this.body.setCoords();
       this.group.removeWithUpdate(this.stats as fabric.Group);
       this.stats = undefined;
-
-      return { width, height };
     } else {
       this.stats = getStats(
         this.canvas,
@@ -231,8 +220,6 @@ export class StageNodeShape implements Shape {
 
       this.body.setCoords();
       this.group.addWithUpdate(this.stats);
-
-      return { width, height };
     }
   }
 

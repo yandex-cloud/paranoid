@@ -16,10 +16,6 @@ import { getMeta } from "./meta";
 import { getStats } from "./stats";
 import { TreeNode } from "../../../tree";
 import { ParanoidEmmiter } from "../../../event-emmiter";
-import {
-  getTreeMaxRight,
-  recalculatePositions,
-} from "../../../layout/topology/utils";
 
 export class TopolgyNodeShape implements Shape {
   private canvas: fabric.Canvas;
@@ -129,7 +125,6 @@ export class TopolgyNodeShape implements Shape {
       this.body.setCoords();
       this.group.removeWithUpdate(this.stats as fabric.Group);
       this.stats = undefined;
-      return { width, height };
     } else {
       this.stats = getStats(
         this.canvas,
@@ -161,8 +156,6 @@ export class TopolgyNodeShape implements Shape {
       time.setCoords();
       this.body.setCoords();
       this.group.addWithUpdate(this.stats);
-
-      return { width, height };
     }
   }
 
@@ -262,13 +255,8 @@ export class TopolgyNodeShape implements Shape {
 
   private initExpand() {
     this.body.on("mousedown", () => {
-      const maxRight = getTreeMaxRight(this.treeNode);
-      const newDimentions = this.onExpand();
-
+      this.onExpand();
       this.expanded = !this.expanded;
-
-      recalculatePositions(this.treeNode, newDimentions, maxRight, this.opts);
-      this.canvas.requestRenderAll();
       this.em.dispatch("node:resize", this.treeNode);
     });
   }

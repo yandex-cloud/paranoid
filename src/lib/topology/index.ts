@@ -4,6 +4,7 @@ import { Colors, Data, ParanoidOpts, Shapes } from "../models";
 import Parser from "../parser";
 import { loadFonts } from "../utils";
 import { getCanvasObjects as getTopologyObjects } from "../layout/topology";
+import { Tree } from "../tree";
 import { getTopologyLinks } from "../links";
 import { ParanoidEmmiter } from "../event-emmiter";
 import { NODE_MARGIN_BOTTOM } from "../constants";
@@ -14,7 +15,9 @@ export class Topology {
   private parser: Parser;
   private shapes?: Shapes;
   private em: ParanoidEmmiter;
-  private links: fabric.Group[];
+  private trees: Tree[];
+  private nodes: fabric.Object[];
+  private links: fabric.Object[];
 
   constructor(root: string, opts: ParanoidOpts, data: Data, shapes?: Shapes) {
     this.canvas = getCanvas(root, opts);
@@ -22,42 +25,16 @@ export class Topology {
     this.opts = opts;
     this.shapes = shapes;
     this.em = new ParanoidEmmiter();
+    this.trees = [];
+    this.nodes = [];
     this.links = [];
     this.listenNodeResize();
   }
 
   render() {
     loadFonts().then(() => {
-      const trees = this.parser.parseData();
-      const canvHeight = this.canvas.getHeight() || 0;
-      const canvWidth = this.canvas.getWidth() || 0;
-      let maxBottom = canvHeight;
-      let maxRight = canvWidth;
-
-      let treeTop = this.opts.initialTop;
-      const treeLeft = this.opts.initialLeft;
-      trees.forEach((tree) => {
-        tree.setCanvas(this.canvas);
-
-        // @ts-ignore
-        const { nodes, bottom, right } = getTopologyObjects(
-          tree,
-          treeTop,
-          treeLeft,
-          this.opts,
-          this.shapes as Shapes,
-          this.em
-        );
-
-        treeTop = bottom + NODE_MARGIN_BOTTOM;
-
-        maxBottom = Math.max(bottom, maxBottom);
-        maxRight = Math.max(right, maxRight);
-
-        const links = getTopologyLinks(this.parser, this.opts);
-
-        this.renderIntoCanvas(nodes, links);
-      });
+      this.trees = this.parser.parseData();
+      this.renderIntoCanvas();
 
       if (this.opts.initialZoomFitsCanvas) {
         this.zoomObjectsToFitCanvas();
@@ -93,9 +70,46 @@ export class Topology {
     return this.canvas;
   }
 
-  private renderIntoCanvas(nodes: fabric.Object[], links: fabric.Group[]) {
-    this.links.push(...links);
-    this.canvas.add(...links, ...nodes);
+  private renderIntoCanvas() {
+    this.nodes.forEach((node) => {
+      this.canvas.remove(node);
+    });
+    this.nodes = [];
+    this.links.forEach((link) => {
+      this.canvas.remove(link);
+    });
+    this.links = [];
+    const canvHeight = this.canvas.getHeight() || 0;
+    const canvWidth = this.canvas.getWidth() || 0;
+    let maxBottom = canvHeight;
+    let maxRight = canvWidth;
+
+    let treeTop = this.opts.initialTop;
+    const treeLeft = this.opts.initialLeft;
+    this.trees.forEach((tree) => {
+      tree.setCanvas(this.canvas);
+
+      const { nodes, bottom, right } = getTopologyObjects(
+        tree,
+        treeTop,
+        treeLeft,
+        this.opts,
+        this.shapes as Shapes,
+        this.em
+      );
+
+      treeTop = bottom + NODE_MARGIN_BOTTOM;
+
+      maxBottom = Math.max(bottom, maxBottom);
+      maxRight = Math.max(right, maxRight);
+
+      const links = getTopologyLinks(this.parser, this.opts);
+
+      this.nodes.push(...nodes);
+      this.links.push(...links);
+      this.canvas.add(...links, ...nodes);
+    });
+
     this.bringNodesToFront();
   }
 
@@ -113,11 +127,7 @@ export class Topology {
 
   private listenNodeResize() {
     this.em.addEventListener("node:resize", () => {
-      this.links.forEach((link) => {
-        this.canvas.remove(link);
-      });
-      const links = getTopologyLinks(this.parser, this.opts);
-      this.renderIntoCanvas([], links);
+      this.renderIntoCanvas();
     });
   }
 

@@ -10,10 +10,10 @@ import { GroupControls } from "../../../constants";
 import { TreeNode } from "../../../tree";
 import { ParanoidEmmiter } from "../../../event-emmiter";
 import { NodeSize } from "./constants";
+import { getStage } from "./stage";
 import { getTitle } from "./title";
-import { getStats } from "../../postgresql-explain/node/stats";
 
-export class ConnectionNodeShape implements Shape {
+export class QueryNodeShape implements Shape {
   private readonly canvas: fabric.Canvas;
   private readonly coords: Coordinates;
   private readonly treeNode: TreeNode;
@@ -23,9 +23,9 @@ export class ConnectionNodeShape implements Shape {
   private objects: fabric.Object[];
   private body: fabric.Object;
   private group: fabric.Group;
-  private stats?: fabric.Group;
   private expanded = false;
-  private expandedNodeHeight = 0;
+  private shadow: fabric.Shadow;
+  private hoverShadow: fabric.Shadow;
   private nodeHeight = 0;
 
   constructor(
@@ -42,6 +42,17 @@ export class ConnectionNodeShape implements Shape {
     this.em = em;
     this.data = _.get(treeNode, ["data", "data"]);
 
+    this.shadow = new fabric.Shadow({
+      color: opts.colors.nodeShadow,
+      offsetY: 1,
+      blur: 5,
+    });
+    this.hoverShadow = new fabric.Shadow({
+      color: opts.colors.nodeShadow,
+      offsetY: 3,
+      blur: 8,
+    });
+
     this.objects = this.prepareShapeObjects();
     this.setShapeObjectsCoords();
     this.body = this.prepareNodeBody();
@@ -54,25 +65,26 @@ export class ConnectionNodeShape implements Shape {
   }
 
   getFillColor() {
-    return this.opts.colors.getCommonColor("base-misc");
+    return this.opts.colors.nodeFill;
   }
 
   getHoverFillColor() {
-    return this.opts.colors.getCommonColor("base-misc-hover");
+    return this.opts.colors.nodeHover;
   }
 
   getShadow() {
-    return undefined;
+    return this.shadow;
   }
 
   getHoverShadow() {
-    return undefined;
+    return this.hoverShadow;
   }
 
   toggleHighlight(highlight: boolean) {
     if (!this.expanded) {
       this.body.set({
         fill: highlight ? this.getHoverFillColor() : this.getFillColor(),
+        shadow: this.getHoverShadow(),
       });
     }
     this.canvas.requestRenderAll();
@@ -89,31 +101,29 @@ export class ConnectionNodeShape implements Shape {
       width: NodeSize.width,
       height: this.nodeHeight,
       fill: this.getFillColor(),
-      stroke: colors.getCommonColor("line-misc"),
+      stroke: colors?.nodeShadow,
       rx: NodeSize.borderRadius,
       ry: NodeSize.borderRadius,
-      hoverCursor: this.isExpandable() ? "pointer" : "default",
+      shadow: this.getShadow(),
+      hoverCursor: "default",
     });
   }
 
   private prepareShapeObjects() {
-    const title = getTitle(
-      this.data.name || "",
-      this.isExpandable(),
-      this.opts.colors
-    );
+    const stage = getStage("Query", this.opts.colors);
+    const title = getTitle([this.data.name || ""], this.opts.colors);
 
-    return [title];
+    return [stage, title];
   }
 
   private setShapeObjectsCoords() {
-    const [title] = this.objects;
+    const [stage, title] = this.objects;
     const top = NodeSize.padding;
-    // const left = NodeSize.padding;
+    const left = NodeSize.padding;
+    const titleTop = top + stage.getScaledHeight() + NodeSize.textOffset;
 
-    const titleWidth = title.getScaledWidth();
-
-    title.set({ left: NodeSize.width / 2 - titleWidth / 2, top });
+    stage.set({ left, top });
+    title.set({ left, top: titleTop });
   }
 
   private createGroup() {
@@ -127,10 +137,6 @@ export class ConnectionNodeShape implements Shape {
 
   private initListeners() {
     this.initHover();
-
-    if (this.isExpandable()) {
-      this.initExpand();
-    }
   }
 
   private initHover() {
@@ -143,62 +149,5 @@ export class ConnectionNodeShape implements Shape {
       this.em.dispatch("node:mouseout", this.treeNode);
       this.toggleHighlight(false);
     });
-  }
-
-  private initExpand() {
-    this.group.on("mousedown", (event) => {
-      if (this.stats && event.subTargets?.includes(this.stats)) {
-        return;
-      }
-
-      this.updateDimensions();
-      this.expanded = !this.expanded;
-      this.em.dispatch("node:resize", this.treeNode);
-    });
-  }
-
-  private updateDimensions() {
-    const colors = this.opts.colors;
-
-    if (this.expanded) {
-      const width = NodeSize.width;
-      const height = this.nodeHeight;
-
-      this.body.set({
-        width,
-        height,
-        fill: this.getFillColor(),
-        shadow: this.getShadow(),
-      });
-      this.body.setCoords();
-      this.group.removeWithUpdate(this.stats as fabric.Group);
-      this.stats = undefined;
-    } else {
-      this.stats = getStats(
-        this.canvas,
-        this.data.stats!,
-        (this.group.top || 0) + this.body.getScaledHeight() + NodeSize.padding,
-        (this.group.left || 0) + NodeSize.padding,
-        colors
-      );
-      this.expandedNodeHeight =
-        this.nodeHeight + this.stats.getScaledHeight() + NodeSize.padding * 2;
-
-      const width = NodeSize.expandedWidth;
-      const height = this.expandedNodeHeight;
-      this.body.set({
-        width,
-        height,
-        fill: this.getFillColor(),
-        shadow: this.getShadow(),
-      });
-
-      this.body.setCoords();
-      this.group.addWithUpdate(this.stats);
-    }
-  }
-
-  private isExpandable() {
-    return Boolean(this.data.stats && this.data.stats.length > 0);
   }
 }

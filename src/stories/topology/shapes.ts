@@ -7,8 +7,6 @@ import {
   Coordinates,
   GroupControls,
   NodeSizes,
-  getTreeMaxRight,
-  recalculatePositions,
   fabric,
   ParanoidEmmiter,
 } from "../../lib";
@@ -133,14 +131,11 @@ class DefaultShape implements Shape {
     const em = this.em;
     const treeNode = this.treeNode;
     const canvas = this.canvas;
-    const opts = this.opts;
     const body = this.body;
     const width = NodeSizes.width;
     const height = NodeSizes.height;
 
     body.on("mousedown", () => {
-      const maxRight = getTreeMaxRight(treeNode);
-
       if (this.expanded) {
         body.set({
           fill: this.getFillColor(),
@@ -150,7 +145,6 @@ class DefaultShape implements Shape {
         });
 
         this.group.addWithUpdate();
-        recalculatePositions(treeNode, { width, height }, maxRight, opts);
         em.dispatch("node:resize", treeNode);
         this.expanded = false;
       } else {
@@ -162,12 +156,6 @@ class DefaultShape implements Shape {
         });
 
         this.group.addWithUpdate();
-        recalculatePositions(
-          treeNode,
-          { width: 360, height: 400 },
-          maxRight,
-          opts
-        );
         em.dispatch("node:resize", treeNode);
         this.expanded = true;
       }

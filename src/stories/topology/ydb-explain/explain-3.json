@@ -1,23 +1,24 @@
 {
     "Plan": {
-        "PlanNodeId": 1,
         "Node Type": "Query",
+        "PlanNodeType": "Query",
         "Plans": [
             {
-                "PlanNodeId": 2,
+                "PlanNodeId": 6,
                 "Node Type": "Result",
+                "PlanNodeType": "ResultSet",
                 "Plans": [
                     {
-                        "PlanNodeId": 3,
+                        "PlanNodeId": 5,
                         "Node Type": "Collect",
                         "Plans": [
                             {
                                 "PlanNodeId": 4,
-                                "Node Type": "Gather",
+                                "Node Type": "UnionAll",
                                 "PlanNodeType": "Connection",
                                 "Plans": [
                                     {
-                                        "PlanNodeId": 5,
+                                        "PlanNodeId": 3,
                                         "Operators": [
                                             {
                                                 "SortBy": "(item) → item.App",
@@ -31,15 +32,15 @@
                                         "Node Type": "Sort → Aggregate",
                                         "Plans": [
                                             {
-                                                "PlanNodeId": 6,
-                                                "Node Type": "Shuffle",
+                                                "PlanNodeId": 2,
+                                                "Node Type": "HashShuffle",
                                                 "PlanNodeType": "Connection",
                                                 "Plans": [
                                                     {
                                                         "Tables": [
                                                             "\/Root\/Logs"
                                                         ],
-                                                        "PlanNodeId": 7,
+                                                        "PlanNodeId": 1,
                                                         "Operators": [
                                                             {
                                                                 "ReadRanges": [

@@ -3,6 +3,7 @@ import {
   GraphNode,
   ExplainPlanNodeData,
   TopologyNodeDataStats,
+  TopologyNodeDataStatsItem,
   TopologyNodeDataStatsSection,
 } from "../../../lib";
 
@@ -12,7 +13,7 @@ interface PlanOperator {
 }
 
 export interface Plan {
-  PlanNodeId: number;
+  PlanNodeId?: number;
   "Node Type": string;
   Plans?: Plan[];
   Operators?: PlanOperator[];
@@ -24,6 +25,13 @@ export interface Plan {
 export interface RootPlan {
   Plan: Plan;
 }
+
+const CONNECTION_NODE_META_FIELDS = new Set([
+  "PlanNodeId",
+  "PlanNodeType",
+  "Node Type",
+  "Plans",
+]);
 
 function prepareStats(plan: Plan) {
   const stats: TopologyNodeDataStats[] = [];
@@ -55,7 +63,39 @@ function prepareStats(plan: Plan) {
     });
   }
 
+  if (plan.PlanNodeType === "Connection") {
+    const attrStats: TopologyNodeDataStatsItem[] = [];
+
+    for (const [key, value] of Object.entries(plan)) {
+      if (CONNECTION_NODE_META_FIELDS.has(key)) {
+        continue;
+      }
+
+      attrStats.push({ name: key, value: String(value) });
+    }
+
+    if (attrStats.length > 0) {
+      stats.push({
+        group: "Attributes",
+        stats: attrStats,
+      });
+    }
+  }
+
   return stats;
+}
+
+function getNodeType(plan: Plan) {
+  switch (plan.PlanNodeType) {
+    case "Connection":
+      return "connection";
+    case "ResultSet":
+      return "result";
+    case "Query":
+      return "query";
+    default:
+      return "stage";
+  }
 }
 
 export function parseExplain(explain: RootPlan) {
@@ -68,7 +108,7 @@ export function parseExplain(explain: RootPlan) {
         name: String(p.PlanNodeId),
         data: {
           id: p.PlanNodeId,
-          type: p.PlanNodeType === "Connection" ? "connection" : "stage",
+          type: getNodeType(p),
           name: p["Node Type"],
           operators: p.Operators?.map((o) => o.Name),
           stats: prepareStats(p),
@@ -86,7 +126,7 @@ export function parseExplain(explain: RootPlan) {
     name: String(rootPlan.PlanNodeId),
     data: {
       id: rootPlan.PlanNodeId,
-      type: "stage",
+      type: getNodeType(rootPlan),
       name: rootPlan["Node Type"],
     },
   };
